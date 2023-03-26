@@ -38,16 +38,16 @@ func (h *Handler) Audio(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) TextToPic(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET is allowed", http.StatusMethodNotAllowed)
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	fmt.Fprintf(w, "TextToPic, %q", html.EscapeString(r.URL.Path))
 }
 
 func (h *Handler) PicToPic(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET is allowed", http.StatusMethodNotAllowed)
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	fmt.Fprintf(w, "PicToPic, %q", html.EscapeString(r.URL.Path))

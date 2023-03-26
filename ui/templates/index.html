@@ -33,37 +33,37 @@
 </div>
 
 <div class="px-4 container">
-    <form>
+    <form class="needs-validation" id="encrypt-form" novalidate>
         <div class="border rounded p-2">
-            <h5 for="exampleInputPassword1" class="form-label ">Stego type</h5>
+            <h5 class="form-label ">Stego type</h5>
             <div class="form-check" onclick="show_text()">
-                <input class="form-check-input" type="radio" name="flexRadioDefault"
-                       id="flexRadioDefault1"
-                       checked>
-                <label class="form-check-label" for="flexRadioDefault1">
+                <input class="form-check-input" type="radio" name="stegoType"
+                       id="checkbox-text"
+                       checked value="text">
+                <label class="form-check-label" for="checkbox-text">
                     Text
                 </label>
             </div>
             <div class="form-check" onclick="show_file_input()">
-                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-                <label class="form-check-label" for="flexRadioDefault2">
+                <input class="form-check-input" type="radio" name="stegoType" id="checkbox-picture" value="picture">
+                <label class="form-check-label" for="checkbox-picture">
                     Picture
                 </label>
             </div>
         </div>
         <div class="mb-3 mt-1" id="text-input-div">
-            <h5 for="exampleInputPassword1" class="form-label mb-2">Text to hide</h5>
-            <input type="password" class="form-control" id="exampleInputPassword1">
+            <h5 for="input-text" class="form-label mb-2">Text to hide</h5>
+            <input class="form-control" id="input-text" name="inputText" required>
         </div>
-        <div class="mb-3 mt-1" style="display: none" id="file-input-div">
-            <h5 for="formFile" class="form-label">File to hide</h5>
-            <input class="form-control" type="file" id="sourceFile">
+        <div class="mb-3 mt-1" id="file-input-div" hidden>
+            <h5 for="source-file" class="form-label">File to hide</h5>
+            <input class="form-control" type="file" id="source-file" name="sourceFile">
         </div>
         <div class="mb-3">
-            <h5 for="formFile" class="form-label">File to hide in</h5>
-            <input class="form-control" type="file" id="hostFile">
+            <h5 for="host-file" class="form-label">File to hide in</h5>
+            <input class="form-control" type="file" id="host-file" name="hostFile" required>
         </div>
-        <button type="submit" class="btn btn-success">Submit</button>
+        <button class="btn btn-success" id="submit-button">Зашифровать</button>
     </form>
 </div>
 
