@@ -3,7 +3,9 @@ package handlers
 import (
 	"fmt"
 	"html"
+	"io"
 	"net/http"
+	"os"
 	"steganography-task/internal/service"
 )
 
@@ -42,7 +44,44 @@ func (h *Handler) TextToPic(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	fmt.Fprintf(w, "TextToPic, %q", html.EscapeString(r.URL.Path))
+
+	err := r.ParseMultipartForm(5 * 1024 * 1024)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	stegoTypeForm := r.PostForm.Get("stegoType")
+	inputTextForm := r.PostForm.Get("inputText")
+	sourceFileForm := r.PostForm.Get("sourceFile")
+	hostFileForm := r.PostForm.Get("hostFile")
+	fmt.Println("stegoTypeForm : ", stegoTypeForm)
+	fmt.Println("inputTextForm : ", inputTextForm)
+	fmt.Println("sourceFileForm : ", len(sourceFileForm))
+	fmt.Println("hostFileForm : ", len(hostFileForm))
+
+	hostFile, hostFileHeader, hostFileErr := r.FormFile("hostFile")
+	if hostFileErr != nil {
+		http.Error(w, "hostFile is missing", http.StatusBadRequest)
+		return
+	}
+	defer hostFile.Close()
+
+	out, err := os.Create(hostFileHeader.Filename)
+	defer out.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, err = io.Copy(out, hostFile)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	return
+
 }
 
 func (h *Handler) PicToPic(w http.ResponseWriter, r *http.Request) {
@@ -50,5 +89,54 @@ func (h *Handler) PicToPic(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	stegoTypeForm := r.PostForm.Get("stegoType")
+	inputTextForm := r.PostForm.Get("inputText")
+	sourceFileForm := r.PostForm.Get("sourceFile")
+	hostFileForm := r.PostForm.Get("hostFile")
+	fmt.Println("stegoTypeForm : ", stegoTypeForm)
+	fmt.Println("inputTextForm : ", inputTextForm)
+	fmt.Println("sourceFileForm : ", len(sourceFileForm))
+	fmt.Println("hostFileForm : ", len(hostFileForm))
+
+	hostFile, hostFileHeader, hostFileErr := r.FormFile("hostFile")
+	if hostFileErr != nil {
+		http.Error(w, "hostFile is missing", http.StatusBadRequest)
+		return
+	}
+	defer hostFile.Close()
+
+	sourceFile, sourceFileHeader, sourceFileErr := r.FormFile("sourceFile")
+	if sourceFileErr != nil {
+		http.Error(w, "sourceFile is missing", http.StatusBadRequest)
+		return
+	}
+	defer sourceFile.Close()
+
+	out, err := os.Create(hostFileHeader.Filename)
+	defer out.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, err = io.Copy(out, hostFile)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	out2, err := os.Create(sourceFileHeader.Filename)
+	defer out2.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_, err = io.Copy(out2, sourceFile)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	fmt.Fprintf(w, "PicToPic, %q", html.EscapeString(r.URL.Path))
 }

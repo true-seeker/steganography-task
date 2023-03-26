@@ -17,13 +17,29 @@ function show_file_input() {
 const form = document.querySelector('#encrypt-form')
 
 const submit_button = document.querySelector('#submit-button')
-submit_button.addEventListener('click', event => {
+submit_button.addEventListener('click', async event => {
     event.preventDefault()
     event.stopPropagation()
     if (!form.checkValidity()) {
         console.log("false valid")
     } else {
-        console.log("true valid")
+        let formData = new FormData(form);
+
+        let response;
+        if (formData.get('stegoType') === 'text') {
+            response = await fetch('api/text_to_pic', {
+                method: 'POST',
+                body: formData,
+            });
+        } else {
+            response = await fetch('api/pic_to_pic', {
+                method: 'POST',
+                body: formData,
+            });
+        }
+        let result = await response;
+        console.log(result)
+
         return false
     }
     form.classList.add('was-validated')

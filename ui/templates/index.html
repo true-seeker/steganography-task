@@ -57,11 +57,12 @@
         </div>
         <div class="mb-3 mt-1" id="file-input-div" hidden>
             <h5 for="source-file" class="form-label">File to hide</h5>
-            <input class="form-control" type="file" id="source-file" name="sourceFile">
+            <input class="form-control" type="file" id="source-file" name="sourceFile" accept="image/png, image/jpeg">
         </div>
         <div class="mb-3">
             <h5 for="host-file" class="form-label">File to hide in</h5>
-            <input class="form-control" type="file" id="host-file" name="hostFile" required>
+            <input class="form-control" type="file" id="host-file" name="hostFile" accept="image/png, image/jpeg"
+                   required>
         </div>
         <button class="btn btn-success" id="submit-button">Зашифровать</button>
     </form>
