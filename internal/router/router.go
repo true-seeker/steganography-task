@@ -19,6 +19,8 @@ func (router *Router) InitRoutes(r *http.ServeMux) *http.ServeMux {
 
 	r.HandleFunc("/", handler.Index)
 	r.HandleFunc("/audio", handler.Audio)
+	r.HandleFunc("/api/text_to_pic", handler.TextToPic)
+	r.HandleFunc("/api/pic_to_pic", handler.PicToPic)
 
 	return r
 }
