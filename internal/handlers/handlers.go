@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"bytes"
 	"fmt"
-	"html"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
+	"log"
 	"net/http"
-	"os"
 	"steganography-task/internal/service"
 )
 
@@ -67,21 +70,32 @@ func (h *Handler) TextToPic(w http.ResponseWriter, r *http.Request) {
 	}
 	defer hostFile.Close()
 
-	out, err := os.Create(hostFileHeader.Filename)
-	defer out.Close()
+	hostImage, _, err := image.Decode(hostFile)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Printf("Host image decode error error %v", err)
+		http.Error(w, "Host image decode error error", http.StatusBadRequest)
 		return
 	}
 
-	_, err = io.Copy(out, hostFile)
+	encodedImageBuf, err := h.steganographyService.EncodeTextToPic(hostImage, inputTextForm)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Printf("Eecode error %v", err)
+		http.Error(w, "Encode error", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", hostFileHeader.Filename))
+	w.Header().Set("Content-Type", http.DetectContentType(encodedImageBuf.Bytes()))
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", encodedImageBuf.Len()))
+
+	_, err = w.Write(encodedImageBuf.Bytes())
+	if err != nil {
+		log.Printf("Buf write error %v", err)
+		http.Error(w, "Buf write error", http.StatusBadRequest)
 		return
 	}
 
 	return
-
 }
 
 func (h *Handler) PicToPic(w http.ResponseWriter, r *http.Request) {
@@ -105,38 +119,44 @@ func (h *Handler) PicToPic(w http.ResponseWriter, r *http.Request) {
 	}
 	defer hostFile.Close()
 
-	sourceFile, sourceFileHeader, sourceFileErr := r.FormFile("sourceFile")
+	sourceFile, _, sourceFileErr := r.FormFile("sourceFile")
 	if sourceFileErr != nil {
 		http.Error(w, "sourceFile is missing", http.StatusBadRequest)
 		return
 	}
 	defer sourceFile.Close()
 
-	out, err := os.Create(hostFileHeader.Filename)
-	defer out.Close()
+	hostImage, _, err := image.Decode(hostFile)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Printf("Host image decode error %v", err)
+		http.Error(w, "Host image decode error", http.StatusBadRequest)
 		return
 	}
 
-	_, err = io.Copy(out, hostFile)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	sourceImageBuf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(sourceImageBuf, hostFile); err != nil {
+		log.Printf("Source image buffer error %v", err)
+		http.Error(w, "Source image buffer error", http.StatusBadRequest)
 		return
 	}
 
-	out2, err := os.Create(sourceFileHeader.Filename)
-	defer out2.Close()
+	encodedImageBuf, err := h.steganographyService.EncodePicToPic(hostImage, *sourceImageBuf)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Printf("Eecode error %v", err)
+		http.Error(w, "Encode error", http.StatusBadRequest)
 		return
 	}
 
-	_, err = io.Copy(out2, sourceFile)
+	fmt.Println(encodedImageBuf.Len())
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", hostFileHeader.Filename))
+	w.Header().Set("Content-Type", http.DetectContentType(encodedImageBuf.Bytes()))
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", encodedImageBuf.Len()))
+
+	_, err = w.Write(encodedImageBuf.Bytes())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Printf("Buf write error %v", err)
+		http.Error(w, "Buf write error", http.StatusBadRequest)
 		return
 	}
-
-	fmt.Fprintf(w, "PicToPic, %q", html.EscapeString(r.URL.Path))
 }
