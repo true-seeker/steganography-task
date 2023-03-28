@@ -79,18 +79,17 @@ func (h *Handler) TextToPicEncode(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseMultipartForm(5 * 1024 * 1024)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	inputTextForm := r.PostForm.Get("inputText")
-	hostFileForm := r.PostForm.Get("hostFile")
-	fmt.Println("inputTextForm : ", inputTextForm)
-	fmt.Println("hostFileForm : ", len(hostFileForm))
 
 	hostFile, hostFileHeader, hostFileErr := r.FormFile("hostFile")
 	if hostFileErr != nil {
-		http.Error(w, "hostFile is missing", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": hostFileErr.Error()})
 		return
 	}
 	defer hostFile.Close()
@@ -98,17 +97,18 @@ func (h *Handler) TextToPicEncode(w http.ResponseWriter, r *http.Request) {
 	hostImage, _, err := image.Decode(hostFile)
 	if err != nil {
 		log.Printf("Host image decode error error %v", err)
-		http.Error(w, "Host image decode error error", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	encodedImageBuf, err := h.steganographyService.EncodeTextToPic(hostImage, inputTextForm)
 	if err != nil {
-		log.Printf("Eecode error %v", err)
-		http.Error(w, "Encode error", http.StatusBadRequest)
+		log.Printf("Encode error %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
-
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", hostFileHeader.Filename))
 	w.Header().Set("Content-Type", http.DetectContentType(encodedImageBuf.Bytes()))
 	w.Header().Set("Content-Length", fmt.Sprintf("%d", encodedImageBuf.Len()))
@@ -116,7 +116,8 @@ func (h *Handler) TextToPicEncode(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(encodedImageBuf.Bytes())
 	if err != nil {
 		log.Printf("Buf write error %v", err)
-		http.Error(w, "Buf write error", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
@@ -131,16 +132,15 @@ func (h *Handler) TextToPicDecode(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseMultipartForm(5 * 1024 * 1024)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
-	//sourceFileForm := r.PostForm.Get("sourceFile")
-	//fmt.Println("sourceFileForm : ", len(sourceFileForm))
-
 	sourceFile, _, sourceFileErr := r.FormFile("sourceFile")
 	if sourceFileErr != nil {
-		http.Error(w, "sourceFile is missing", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 	defer sourceFile.Close()
@@ -148,52 +148,49 @@ func (h *Handler) TextToPicDecode(w http.ResponseWriter, r *http.Request) {
 	sourceImage, _, err := image.Decode(sourceFile)
 	if err != nil {
 		log.Printf("Source image decode error error %v", err)
-		http.Error(w, "Source image decode error error", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	message, err := h.steganographyService.DecodeTextToPic(sourceImage)
 	if err != nil {
 		log.Printf("Decode error %v", err)
-		http.Error(w, "Decode error", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
-	fmt.Println(message)
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(map[string]string{"message": message})
 	if err != nil {
 		log.Printf("json encoder error %v", err)
-		http.Error(w, "json encoder error", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 	return
 }
 
-func (h *Handler) PicToPic(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PicToPicEncode(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	stegoTypeForm := r.PostForm.Get("stegoType")
-	inputTextForm := r.PostForm.Get("inputText")
-	sourceFileForm := r.PostForm.Get("sourceFile")
-	hostFileForm := r.PostForm.Get("hostFile")
-	fmt.Println("stegoTypeForm : ", stegoTypeForm)
-	fmt.Println("inputTextForm : ", inputTextForm)
-	fmt.Println("sourceFileForm : ", len(sourceFileForm))
-	fmt.Println("hostFileForm : ", len(hostFileForm))
 
 	hostFile, hostFileHeader, hostFileErr := r.FormFile("hostFile")
 	if hostFileErr != nil {
-		http.Error(w, "hostFile is missing", http.StatusBadRequest)
+		log.Printf("hostFile is missing %v", hostFileErr)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": hostFileErr.Error()})
 		return
 	}
 	defer hostFile.Close()
-
 	sourceFile, _, sourceFileErr := r.FormFile("sourceFile")
 	if sourceFileErr != nil {
-		http.Error(w, "sourceFile is missing", http.StatusBadRequest)
+		log.Printf("sourceFile is missing %v", sourceFileErr)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": sourceFileErr.Error()})
 		return
 	}
 	defer sourceFile.Close()
@@ -201,25 +198,25 @@ func (h *Handler) PicToPic(w http.ResponseWriter, r *http.Request) {
 	hostImage, _, err := image.Decode(hostFile)
 	if err != nil {
 		log.Printf("Host image decode error %v", err)
-		http.Error(w, "Host image decode error", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
 	sourceImageBuf := bytes.NewBuffer(nil)
-	if _, err := io.Copy(sourceImageBuf, hostFile); err != nil {
+	if _, err := io.Copy(sourceImageBuf, sourceFile); err != nil {
 		log.Printf("Source image buffer error %v", err)
-		http.Error(w, "Source image buffer error", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
-
 	encodedImageBuf, err := h.steganographyService.EncodePicToPic(hostImage, *sourceImageBuf)
 	if err != nil {
-		log.Printf("Eecode error %v", err)
-		http.Error(w, "Encode error", http.StatusBadRequest)
+		log.Printf("Encode error %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
-
-	fmt.Println(encodedImageBuf.Len())
 
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", hostFileHeader.Filename))
 	w.Header().Set("Content-Type", http.DetectContentType(encodedImageBuf.Bytes()))
@@ -228,7 +225,52 @@ func (h *Handler) PicToPic(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(encodedImageBuf.Bytes())
 	if err != nil {
 		log.Printf("Buf write error %v", err)
-		http.Error(w, "Buf write error", http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
+}
+
+func (h *Handler) PicToPicDecode(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	hostFile, sourceFileHeader, sourceFileErr := r.FormFile("hostFile")
+	if sourceFileErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": sourceFileErr.Error()})
+		return
+	}
+	defer hostFile.Close()
+
+	hostImage, _, err := image.Decode(hostFile)
+	if err != nil {
+		log.Printf("Host image decode error %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	decodedPicBuf, err := h.steganographyService.DecodePicToPic(hostImage)
+	if err != nil {
+		log.Printf("Decode error %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", sourceFileHeader.Filename))
+	w.Header().Set("Content-Type", http.DetectContentType(decodedPicBuf.Bytes()))
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", decodedPicBuf.Len()))
+
+	_, err = w.Write(decodedPicBuf.Bytes())
+	if err != nil {
+		log.Printf("Buf write error %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
 }

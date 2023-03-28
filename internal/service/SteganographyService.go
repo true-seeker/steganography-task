@@ -11,6 +11,7 @@ type Steganography interface {
 	EncodeTextToPic(image image.Image, text string) (*bytes.Buffer, error)
 	DecodeTextToPic(image image.Image) (string, error)
 	EncodePicToPic(image image.Image, image2Buf bytes.Buffer) (*bytes.Buffer, error)
+	DecodePicToPic(image image.Image) (*bytes.Buffer, error)
 }
 
 type SteganographyService struct {
@@ -44,4 +45,10 @@ func (s SteganographyService) DecodeTextToPic(image image.Image) (string, error)
 	sizeOfMessage := steganography.GetMessageSizeFromImage(image)
 	msg := steganography.Decode(sizeOfMessage, image)
 	return string(msg), nil
+}
+
+func (s SteganographyService) DecodePicToPic(image image.Image) (*bytes.Buffer, error) {
+	sizeOfMessage := steganography.GetMessageSizeFromImage(image)
+	msg := steganography.Decode(sizeOfMessage, image)
+	return bytes.NewBuffer(msg), nil
 }

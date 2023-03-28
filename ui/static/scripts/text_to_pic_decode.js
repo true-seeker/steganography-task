@@ -1,3 +1,5 @@
+import {show_toast} from "./utils";
+
 const form = document.querySelector('#encrypt-form')
 const submit_button = document.querySelector('#submit-button')
 submit_button.addEventListener('click', async event => {
@@ -13,10 +15,16 @@ submit_button.addEventListener('click', async event => {
                 }
             ).then(response => response.json())
                 .then(response => {
-                    document.getElementById('message-modal-text').innerHTML = response.message;
+                    if (response.status === 400) {
+                        response.blob().then(async (response) => {
+                            show_toast('#FF5A5F', 'Error', JSON.parse(await response.text()).error, 'alert-toast');
+                        })
+                    } else {
+                        document.getElementById('message-modal-text').innerHTML = response.message;
 
-                    const myModal = new bootstrap.Modal(document.getElementById('message-modal'), {})
-                    myModal.show()
+                        const myModal = new bootstrap.Modal(document.getElementById('message-modal'), {})
+                        myModal.show()
+                    }
                 })
             return
         }

@@ -14,13 +14,14 @@
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div id="alert-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <img src="..." class="rounded me-2" alt="...">
-                <strong class="me-auto">Bootstrap</strong>
-                <small>11 mins ago</small>
+                <svg class="bd-placeholder-img rounded me-2" width="20" height="20" xmlns="http://www.w3.org/2000/svg"
+                     aria-hidden="true" preserveAspectRatio="xMidYMid slice" focusable="false">
+                    <rect width="100%" height="100%" fill="#CD1818" id="toast_rect"></rect>
+                </svg>
+                <strong class="me-auto" id="toast_header"></strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <div class="toast-body">
-                Hello, world! This is a toast message.
+            <div class="toast-body" id="toast_message">
             </div>
         </div>
     </div>
@@ -37,7 +38,7 @@
 
         <ul class="nav nav-pills">
             <li class="nav-item mx-1">
-                <a class="btn btn-outline-success" type="submit">Text</a>
+                <a class="btn btn-outline-success" type="submit" href="/text/encode">Text</a>
             </li>
             <li class="nav-item mx-1">
                 <a class="btn btn-success" type="submit" href="/picture/encode">Pictures</a>
@@ -52,20 +53,17 @@
 <div class="px-4 container">
     <div class="btn-group pb-3" role="group" aria-label="Basic radio toggle button group">
         <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-        <a class="btn btn-success" for="btnradio1" href="/picture/encode">Encode</a>
+        <a class="btn btn-outline-success" for="btnradio1" href="/picture/encode">Encode</a>
 
         <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
         <a class="btn btn-outline-success" for="btnradio2" href="/picture/decode">Decode</a>
     </div>
 
     <form class="needs-validation" id="encrypt-form" novalidate>
-        <div class="mb-3 mt-1" id="text-input-div">
-            <h5 for="input-text" class="form-label mb-2">Text to hide</h5>
-            <input class="form-control" id="input-text" name="inputText" required>
-        </div>
-        <div class="mb-3 mt-1" id="file-input-div" hidden>
-            <h5 for="source-file" class="form-label">File to hide</h5>
-            <input class="form-control" type="file" id="source-file" name="sourceFile" accept="image/png, image/jpeg">
+        <div class="mb-3">
+            <h5 for="host-file" class="form-label">File to hide</h5>
+            <input class="form-control" type="file" id="source-file" name="sourceFile" accept="image/png, image/jpeg"
+                   required>
         </div>
         <div class="mb-3">
             <h5 for="host-file" class="form-label">File to hide in</h5>
@@ -80,6 +78,6 @@
         integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
         crossorigin="anonymous"></script>
 <script src="../static/scripts/utils.js" type="module"></script>
-<script src="../static/scripts/text_to_pic_encode.js" type="module"></script>
+<script src="../static/scripts/pic_to_pic_encode.js" type="module"></script>
 </body>
 </html>

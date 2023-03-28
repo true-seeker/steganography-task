@@ -9,7 +9,7 @@ submit_button.addEventListener('click', async event => {
             console.log("false valid")
         } else {
             let formData = new FormData(form);
-            await fetch('/api/text_to_pic_encode', {
+            await fetch('/api/pic_to_pic_encode', {
                     method: 'POST',
                     body: formData,
                 }
