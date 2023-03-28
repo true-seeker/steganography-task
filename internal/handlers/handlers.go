@@ -21,16 +21,44 @@ func NewHandler(steganographyService service.Steganography) *Handler {
 }
 
 func (h *Handler) Index(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" { // Check path here
+	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
 
+	http.Redirect(w, r, "text/encode", http.StatusPermanentRedirect)
+}
+
+func (h *Handler) TextEncode(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Only GET is allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	http.ServeFile(w, r, "ui/templates/index.html")
+	http.ServeFile(w, r, "ui/templates/text_to_pic_encode.html")
+}
+
+func (h *Handler) TextDecode(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	http.ServeFile(w, r, "ui/templates/text_to_pic_decode.html")
+}
+
+func (h *Handler) PictureEncode(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	http.ServeFile(w, r, "ui/templates/pic_to_pic_encode.html")
+}
+
+func (h *Handler) PictureDecode(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	http.ServeFile(w, r, "ui/templates/pic_to_pic_decode.html")
 }
 
 func (h *Handler) Audio(w http.ResponseWriter, r *http.Request) {

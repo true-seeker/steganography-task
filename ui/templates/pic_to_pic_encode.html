@@ -11,6 +11,20 @@
 </head>
 <body>
 <div class="container">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="alert-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <img src="..." class="rounded me-2" alt="...">
+                <strong class="me-auto">Bootstrap</strong>
+                <small>11 mins ago</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Hello, world! This is a toast message.
+            </div>
+        </div>
+    </div>
+
     <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
         <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-incognito"
@@ -23,7 +37,10 @@
 
         <ul class="nav nav-pills">
             <li class="nav-item mx-1">
-                <a class="btn btn-success" type="submit">Pictures</a>
+                <a class="btn btn-outline-success" type="submit">Text</a>
+            </li>
+            <li class="nav-item mx-1">
+                <a class="btn btn-success" type="submit" href="/picture/encode">Pictures</a>
             </li>
             <li class="nav-item mx-1">
                 <a class="btn btn-outline-success" type="submit" href="/audio">Audio</a>
@@ -33,24 +50,15 @@
 </div>
 
 <div class="px-4 container">
+    <div class="btn-group pb-3" role="group" aria-label="Basic radio toggle button group">
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+        <a class="btn btn-success" for="btnradio1" href="/picture/encode">Encode</a>
+
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+        <a class="btn btn-outline-success" for="btnradio2" href="/picture/decode">Decode</a>
+    </div>
+
     <form class="needs-validation" id="encrypt-form" novalidate>
-        <div class="border rounded p-2">
-            <h5 class="form-label ">Stego type</h5>
-            <div class="form-check" onclick="show_text()">
-                <input class="form-check-input" type="radio" name="stegoType"
-                       id="checkbox-text"
-                       checked value="text">
-                <label class="form-check-label" for="checkbox-text">
-                    Text
-                </label>
-            </div>
-            <div class="form-check" onclick="show_file_input()">
-                <input class="form-check-input" type="radio" name="stegoType" id="checkbox-picture" value="picture">
-                <label class="form-check-label" for="checkbox-picture">
-                    Picture
-                </label>
-            </div>
-        </div>
         <div class="mb-3 mt-1" id="text-input-div">
             <h5 for="input-text" class="form-label mb-2">Text to hide</h5>
             <input class="form-control" id="input-text" name="inputText" required>
@@ -64,13 +72,14 @@
             <input class="form-control" type="file" id="host-file" name="hostFile" accept="image/png, image/jpeg"
                    required>
         </div>
-        <button class="btn btn-success" id="submit-button">Зашифровать</button>
+        <button class="btn btn-success" id="submit-button">Encode</button>
     </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
         crossorigin="anonymous"></script>
-<script src="../static/scripts/index.js"></script>
+<script src="../static/scripts/utils.js" type="module"></script>
+<script src="../static/scripts/text_to_pic_encode.js" type="module"></script>
 </body>
 </html>
