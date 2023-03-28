@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"image"
 	_ "image/jpeg"
@@ -70,7 +71,7 @@ func (h *Handler) Audio(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "ui/templates/audio.html")
 }
 
-func (h *Handler) TextToPic(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) TextToPicEncode(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
 		return
@@ -82,13 +83,9 @@ func (h *Handler) TextToPic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	stegoTypeForm := r.PostForm.Get("stegoType")
 	inputTextForm := r.PostForm.Get("inputText")
-	sourceFileForm := r.PostForm.Get("sourceFile")
 	hostFileForm := r.PostForm.Get("hostFile")
-	fmt.Println("stegoTypeForm : ", stegoTypeForm)
 	fmt.Println("inputTextForm : ", inputTextForm)
-	fmt.Println("sourceFileForm : ", len(sourceFileForm))
 	fmt.Println("hostFileForm : ", len(hostFileForm))
 
 	hostFile, hostFileHeader, hostFileErr := r.FormFile("hostFile")
@@ -123,6 +120,53 @@ func (h *Handler) TextToPic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	return
+}
+
+func (h *Handler) TextToPicDecode(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := r.ParseMultipartForm(5 * 1024 * 1024)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	//sourceFileForm := r.PostForm.Get("sourceFile")
+	//fmt.Println("sourceFileForm : ", len(sourceFileForm))
+
+	sourceFile, _, sourceFileErr := r.FormFile("sourceFile")
+	if sourceFileErr != nil {
+		http.Error(w, "sourceFile is missing", http.StatusBadRequest)
+		return
+	}
+	defer sourceFile.Close()
+
+	sourceImage, _, err := image.Decode(sourceFile)
+	if err != nil {
+		log.Printf("Source image decode error error %v", err)
+		http.Error(w, "Source image decode error error", http.StatusBadRequest)
+		return
+	}
+
+	message, err := h.steganographyService.DecodeTextToPic(sourceImage)
+	if err != nil {
+		log.Printf("Decode error %v", err)
+		http.Error(w, "Decode error", http.StatusBadRequest)
+		return
+	}
+	fmt.Println(message)
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(map[string]string{"message": message})
+	if err != nil {
+		log.Printf("json encoder error %v", err)
+		http.Error(w, "json encoder error", http.StatusBadRequest)
+		return
+	}
 	return
 }
 

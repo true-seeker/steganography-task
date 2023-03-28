@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/auyer/steganography"
 	"image"
 	"log"
@@ -10,8 +9,8 @@ import (
 
 type Steganography interface {
 	EncodeTextToPic(image image.Image, text string) (*bytes.Buffer, error)
+	DecodeTextToPic(image image.Image) (string, error)
 	EncodePicToPic(image image.Image, image2Buf bytes.Buffer) (*bytes.Buffer, error)
-	Decode(image image.Image) (string, error)
 }
 
 type SteganographyService struct {
@@ -41,10 +40,8 @@ func (s SteganographyService) EncodePicToPic(image image.Image, image2Buf bytes.
 	return buf, nil
 }
 
-func (s SteganographyService) Decode(image image.Image) (string, error) {
+func (s SteganographyService) DecodeTextToPic(image image.Image) (string, error) {
 	sizeOfMessage := steganography.GetMessageSizeFromImage(image)
-
 	msg := steganography.Decode(sizeOfMessage, image)
-	fmt.Println(string(msg))
 	return string(msg), nil
 }

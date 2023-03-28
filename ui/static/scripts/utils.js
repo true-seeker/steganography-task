@@ -32,7 +32,7 @@ export function show_toast(color, header, message, toast_id) {
     document.getElementById('toast_header').innerHTML = header;
     document.getElementById('toast_message').innerHTML = message;
     const toast = document.getElementById(toast_id)
-    console.log(toast)
+
     const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast)
     toastBootstrap.show()
 }

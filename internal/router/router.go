@@ -26,7 +26,8 @@ func (router *Router) InitRoutes(r *http.ServeMux) *http.ServeMux {
 	r.HandleFunc("/picture/encode", handler.PictureEncode)
 	r.HandleFunc("/picture/decode", handler.PictureDecode)
 	r.HandleFunc("/audio", handler.Audio)
-	r.HandleFunc("/api/text_to_pic", handler.TextToPic)
+	r.HandleFunc("/api/text_to_pic_encode", handler.TextToPicEncode)
+	r.HandleFunc("/api/text_to_pic_decode", handler.TextToPicDecode)
 	r.HandleFunc("/api/pic_to_pic", handler.PicToPic)
 
 	return r
