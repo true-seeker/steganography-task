@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  webapi:
+    image: backend
+    build: ../
+    ports:
+      - "80:80"
+    command: ./steganography-task
