@@ -2,12 +2,12 @@ FROM golang:latest
 
 WORKDIR /app
 
-#COPY go.mod .
-#COPY go.sum .
 COPY . .
 
 RUN go mod download
 
-WORKDIR cmd/it_planet_task
+WORKDIR cmd/steganography-task
 
 RUN go build
+
+WORKDIR /app
