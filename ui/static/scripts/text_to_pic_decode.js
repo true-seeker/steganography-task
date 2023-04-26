@@ -1,4 +1,4 @@
-import {show_toast} from "./utils";
+import {show_toast} from "./utils.js";
 
 const form = document.querySelector('#encrypt-form')
 const submit_button = document.querySelector('#submit-button')

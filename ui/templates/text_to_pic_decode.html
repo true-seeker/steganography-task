@@ -68,11 +68,11 @@
 
 <div class="px-4 container">
     <div class="btn-group pb-3" role="group" aria-label="Basic radio toggle button group">
-        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off">
         <a class="btn btn-outline-success" for="btnradio1" href="/text/encode">Encode</a>
 
-        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-        <a class="btn btn-outline-success" for="btnradio2" href="/text/decode">Decode</a>
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked>
+        <a class="btn btn-success" for="btnradio2" href="/text/decode">Decode</a>
     </div>
 
     <form class="needs-validation" id="encrypt-form" novalidate>
@@ -81,7 +81,7 @@
             <input class="form-control" type="file" id="source-file" name="sourceFile" accept="image/png, image/jpeg"
                    required>
         </div>
-        <button class="btn btn-success" id="submit-button">Encode</button>
+        <button class="btn btn-success" id="submit-button">Decode</button>
     </form>
 </div>
 
